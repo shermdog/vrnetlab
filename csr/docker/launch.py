@@ -48,15 +48,15 @@ class CSR_vm(vrnetlab.VM):
         super(CSR_vm, self).__init__(username, password, disk_image=disk_image)
 
         self.install_mode = install_mode
-        self.num_nics = 9
+        self.nic_type = "virtio-net-pci"
+        self.num_nics = 26
 
         if self.install_mode:
             logger.trace("install mode")
             self.image_name = "config.iso"
             self.create_boot_image()
 
-            self.qemu_args.extend(["-cdrom", "/" +self.image_name]) 
-
+            self.qemu_args.extend(["-cdrom", "/" +self.image_name])
 
     def create_boot_image(self):
         """ Creates a iso image with a bootstrap configuration
@@ -75,6 +75,8 @@ class CSR_vm(vrnetlab.VM):
 
         cfg_file.write("platform console serial\r\n\r\n")
         cfg_file.write("do wr\r\n")
+        # Clear MAC to Interface bindings to ensure clean start
+        cfg_file.write("do clear platform software vnic-if nvtable\r\n\r\n")
         cfg_file.write("do reload\r\n")
         cfg_file.close()
 
@@ -163,7 +165,7 @@ class CSR(vrnetlab.VR):
 
 class CSR_installer(CSR):
     """ CSR installer
-        
+
         Will start the CSR with a mounted iso to make sure that we get
         console output on serial, not vga.
     """
