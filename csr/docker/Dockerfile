@@ -12,7 +12,8 @@ RUN apt-get update -qy \
     socat \
     qemu-kvm \
     genisoimage \
- && rm -rf /var/lib/apt/lists/*
+ && echo "options kvm halt_poll_ns=0" | tee --append /etc/modprobe.d/qemu-system-x86.conf \
+ && echo "options kvm-intel nested=y enable_apicv=n" | tee --append /etc/modprobe.d/qemu-system-x86.conf
 
 ARG IMAGE
 COPY $IMAGE* /
