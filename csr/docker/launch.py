@@ -48,6 +48,7 @@ class CSR_vm(vrnetlab.VM):
         super(CSR_vm, self).__init__(username, password, disk_image=disk_image)
 
         self.install_mode = install_mode
+        self.vcpu = 1
         self.nic_type = "virtio-net-pci"
         self.num_nics = 26
 
@@ -57,6 +58,11 @@ class CSR_vm(vrnetlab.VM):
             self.create_boot_image()
 
             self.qemu_args.extend(["-cdrom", "/" +self.image_name])
+
+        if  self.vcpu > 1:
+            self.qemu_args.extend(["-smp", str(self.vcpu)])
+
+        self.qemu_args.extend(["-cpu", "host"])
 
     def create_boot_image(self):
         """ Creates a iso image with a bootstrap configuration
